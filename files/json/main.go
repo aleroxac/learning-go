@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"reflect"
 
 	"github.com/ghodss/yaml"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type journey struct {
@@ -49,9 +52,27 @@ func convert_from_json_to_yaml(some_json []byte) ([]byte, error) {
 	return some_yaml, err
 }
 
-// func check_if_key_exists(json_content []byte, target_key string) bool {
-// 	return true
-// }
+func check_if_key_exists(some_key string, some_json []byte) bool {
+	json_content, _ := convert_from_json_to_struct(some_json)
+	struct_values := reflect.ValueOf(json_content)
+	var check_status bool
+
+	capitalized_key := cases.Title(language.Und).String(some_key)
+	if struct_values.FieldByName(capitalized_key).IsValid() {
+		check_status = true
+	} else {
+		check_status = false
+	}
+	return check_status
+}
+
+func get_key_value(some_key string, some_json []byte) any {
+	json_content, _ := convert_from_json_to_struct(some_json)
+	capitalized_key := cases.Title(language.Und).String(some_key)
+	struct_info := reflect.ValueOf(json_content)
+	key_value := struct_info.FieldByName(capitalized_key)
+	return key_value
+}
 
 func main() {
 	// ---------- CONVERT[JSON:STRUCT] ----------
@@ -89,12 +110,16 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	fmt.Printf("\n[from JSON to YAML]\n%+s\n\n", string(some_yaml))
+	fmt.Printf("\n[from JSON to YAML]\n%+s", string(some_yaml))
 
-	// ---------- CHECK_IF_KEY_EXISTS[JSON] ----------
-	// target_key := "Level"
-	// check_result := check_if_key_exists(converted_struct_to_json, target_key)
-	// fmt.Printf("\n[check if key exists]\n%s: %t\n\n", target_key, check_result)
+	// ---------- CHECK_KEY_EXISTS ----------
+	key_name := "level"
+	key_exists := check_if_key_exists(key_name, converted_struct_to_json)
+	fmt.Printf("\n[check if a key exists]\n%s: %t\n", key_name, key_exists)
 
-	// ---------- GET_JSON_KEY_VALUE[JSON] ----------
+	// ---------- GET_KEY_VALUE ----------
+	some_key_name := "topic"
+	key_value := get_key_value(some_key_name, converted_struct_to_json)
+	fmt.Printf("\n[get a key value]\n%s: ", some_key_name)
+	fmt.Println(key_value)
 }

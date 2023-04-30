@@ -1,0 +1,9 @@
+**/dest_file.txt-*
+**/file_to_be_created.txt
+**/file_to_be_moved_after.txt
+**/file_to_be_renamed_after.txt
+**/some_file.txt-*
+**/some_file.txt-*
+**/src_file.txt-*
+**/temp_file_to_be_created-*
+**/go.sum

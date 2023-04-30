@@ -1,0 +1,2 @@
+----- FILE:READ[RAW] -----
+hello, i'm a file to be readed!

@@ -75,21 +75,21 @@ func main() {
 	fmt.Printf("[from YAML to STRUCT]\n%+v\n", converted_yaml_to_struct)
 
 	// ---------- CONVERT[STRUCT:YAML] ----------
-	converted_struct_struct_to_yaml := convert_from_struct_to_yaml(converted_yaml_to_struct)
-	fmt.Printf("\n[from STRUCT to YAML]\n%s", converted_struct_struct_to_yaml)
+	converted_struct_to_yaml := convert_from_struct_to_yaml(converted_yaml_to_struct)
+	fmt.Printf("\n[from STRUCT to YAML]\n%s", converted_struct_to_yaml)
 
 	// ---------- CONVERT[YAML:JSON] ----------
-	converted_yaml_to_json := convert_from_yaml_to_json(converted_struct_struct_to_yaml)
+	converted_yaml_to_json := convert_from_yaml_to_json(converted_struct_to_yaml)
 	fmt.Printf("\n[from YAML to JSON]\n%s", converted_yaml_to_json)
 
 	// ---------- CHECK_KEY_EXISTS ----------
 	key_name := "level"
-	key_exists := check_if_key_exists(key_name, converted_struct_struct_to_yaml)
+	key_exists := check_if_key_exists(key_name, converted_struct_to_yaml)
 	fmt.Printf("\n\n[check if a key exists]\n%s: %t", key_name, key_exists)
 
 	// ---------- GET_KEY_VALUE ----------
 	some_key_name := "topic"
-	key_value := get_key_value(some_key_name, converted_struct_struct_to_yaml)
+	key_value := get_key_value(some_key_name, converted_struct_to_yaml)
 	fmt.Printf("\n\n[get a key value]\n%s: ", some_key_name)
 	fmt.Println(key_value)
 

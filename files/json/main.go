@@ -26,7 +26,7 @@ type skill struct {
 	Journeys []journey `json:"journeys" yaml:"journeys"`
 }
 
-func convert_from_json_to_struct(some_json []byte) (skill, error) {
+func convert_from_json_to_known_struct(some_json []byte) (skill, error) {
 	var some_struct skill
 
 	err := json.Unmarshal(some_json, &some_struct)
@@ -34,6 +34,23 @@ func convert_from_json_to_struct(some_json []byte) (skill, error) {
 		log.Panicf("error while convert from json to struct: %s", err)
 	}
 	return some_struct, err
+}
+
+func convert_from_json_to_unknown_struct(some_json []byte) ([]byte, error) {
+	// Use a map to decode the JSON
+	var data map[string]interface{}
+	err := json.Unmarshal(some_json, &data)
+	if err != nil {
+		fmt.Println("Error to decode JSON:", err)
+	}
+
+	// Build the final value based on decoded data
+	var json_decoded string
+	for key, value := range data {
+		json_decoded += fmt.Sprintf("%s: %v\n", key, value)
+	}
+
+	return []byte(json_decoded), err
 }
 
 func convert_from_struct_to_json(some_struct skill) ([]byte, error) {
@@ -53,7 +70,7 @@ func convert_from_json_to_yaml(some_json []byte) ([]byte, error) {
 }
 
 func check_if_key_exists(some_key string, some_json []byte) bool {
-	json_content, _ := convert_from_json_to_struct(some_json)
+	json_content, _ := convert_from_json_to_known_struct(some_json)
 	struct_values := reflect.ValueOf(json_content)
 	var check_status bool
 
@@ -67,7 +84,7 @@ func check_if_key_exists(some_key string, some_json []byte) bool {
 }
 
 func get_key_value(some_key string, some_json []byte) any {
-	json_content, _ := convert_from_json_to_struct(some_json)
+	json_content, _ := convert_from_json_to_known_struct(some_json)
 	capitalized_key := cases.Title(language.Und).String(some_key)
 	struct_info := reflect.ValueOf(json_content)
 	key_value := struct_info.FieldByName(capitalized_key)
@@ -75,13 +92,21 @@ func get_key_value(some_key string, some_json []byte) any {
 }
 
 func main() {
-	// ---------- CONVERT[JSON:STRUCT] ----------
-	var some_json = []byte(`{"name": "golang", "level": 1, "topic": "programming", "subject": "language", "priority": 1, "journeys": [{"name": "working-with-json", "status": "in-progress", "progress": 1}]}`)
-	converted_json_to_struct, err := convert_from_json_to_struct(some_json)
+	// ---------- CONVERT[JSON:KNOW_STRUCT] ----------
+	var some_json1 = []byte(`{"name": "golang", "level": 1, "topic": "programming", "subject": "language", "priority": 1, "journeys": [{"name": "working-with-json", "status": "in-progress", "progress": 1}]}`)
+	converted_json_to_known_struct, err := convert_from_json_to_known_struct(some_json1)
 	if err != nil {
 		log.Fatalf("error while conversion: %s", err)
 	}
-	fmt.Printf("[from JSON to STRUCT]\n%+v\n\n", converted_json_to_struct)
+	fmt.Printf("[from JSON to KNOW_STRUCT]\n%+v\n\n", converted_json_to_known_struct)
+
+	// ---------- CONVERT[JSON:UNKNOW_STRUCT] ----------
+	var some_json2 = []byte(`{"name": "golang", "level": 1, "topic": "programming", "subject": "language", "priority": 1, "journeys": [{"name": "working-with-json", "status": "in-progress", "progress": 1}]}`)
+	converted_json_to_unknown_struct, err := convert_from_json_to_unknown_struct(some_json2)
+	if err != nil {
+		log.Fatalf("error while conversion: %s", err)
+	}
+	fmt.Printf("[from JSON to UNKNOW_STRUCT]\n%+s\n\n", converted_json_to_unknown_struct)
 
 	// ---------- CONVERT[STRUCT:JSON] ----------
 	some_struct := skill{
